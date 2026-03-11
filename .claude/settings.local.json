@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx sv:*)",
+      "Bash(cd /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-request-finance/frontend && npm install 2>&1 | tail -5)",
+      "Bash(npm run:*)",
+      "Bash(npx svelte-kit:*)",
+      "Bash(npx vite:*)"
+    ]
+  }
+}
