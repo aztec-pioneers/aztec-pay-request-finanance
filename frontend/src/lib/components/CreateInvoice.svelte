@@ -1,10 +1,24 @@
 <script lang="ts">
-  let { onClose } = $props<{ onClose: () => void }>();
+  import InvoiceSuccess from './InvoiceSuccess.svelte';
+
+  let { onClose, onBackToDashboard = () => {} } = $props<{ onClose: () => void; onBackToDashboard?: () => void }>();
 
   let selectedNetwork = $state('aztec');
   let selectedCurrency = $state('usdc');
   let invoiceType = $state('regular');
   let paymentMethod = $state('crypto');
+  let walletAddress = $state('');
+  let memo = $state('');
+  let isSending = $state(false);
+  let invoiceNumber = $state(0);
+  let showSuccess = $state(false);
+
+  $effect(() => {
+    fetch('http://localhost:3001/api/invoices/next-number')
+      .then(r => r.json())
+      .then(data => { invoiceNumber = data.nextNumber; })
+      .catch(() => { invoiceNumber = 1; });
+  });
 
   type LineItem = {
     id: number;
@@ -46,6 +60,69 @@
 
   function fmt(n: number): string {
     return '$' + n.toFixed(2);
+  }
+
+  // Progress step derivations
+  let credentialsComplete = $derived(true); // always filled (From section is static)
+  let billedToComplete = $derived(true); // Alice Ventures is pre-filled as default client
+  let currencyComplete = $derived(true); // USD is always selected
+  let invoiceTypeComplete = $derived(true); // always has a selection
+  let receivePaymentComplete = $derived(walletAddress.trim().length > 0 && selectedNetwork !== '' && selectedCurrency !== '');
+  let amountComplete = $derived(lineItems.some(item => item.unitPrice > 0));
+  let memoComplete = $derived(memo.trim().length > 0);
+
+  function truncateWallet(addr: string): string {
+    if (addr.length <= 14) return addr;
+    return addr.slice(0, 8) + '...' + addr.slice(-6);
+  }
+
+  async function createAndSend() {
+    isSending = true;
+    try {
+      const res = await fetch('http://localhost:3001/api/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          invoiceNumber: `Invoice #${invoiceNumber}`,
+          issuedDate: '2026-03-11',
+          dueDate: '2026-04-10',
+          fromName: 'John Doe',
+          fromAddress: '742 Evergreen Terrace, Apt 3B, 10001 New York, NY, United States',
+          fromEmail: 'johndoe@example.com',
+          clientName: 'Alice Ventures',
+          clientEmail: 'alice@aliceventures.com',
+          invoiceCurrency: 'USD',
+          invoiceType,
+          paymentMethod,
+          paymentNetwork: selectedNetwork,
+          paymentCurrency: selectedCurrency,
+          walletAddress,
+          amountWithoutTax,
+          totalTax,
+          totalAmount,
+          memo: memo || null,
+          items: lineItems.map(item => ({
+            description: item.description,
+            qty: item.qty,
+            unitPrice: item.unitPrice,
+            discount: item.discount,
+            taxPercent: item.taxPercent,
+            amount: itemAmount(item),
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        showSuccess = true;
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.error || 'Failed to create invoice'}`);
+      }
+    } catch {
+      alert('Failed to connect to backend. Is it running on port 3001?');
+    } finally {
+      isSending = false;
+    }
   }
 </script>
 
@@ -97,7 +174,7 @@
                 <path d="M10 2l2 2-8 8H2v-2l8-8z"/>
               </svg>
             </span>
-            <h2 class="invoice-title">Invoice #14</h2>
+            <h2 class="invoice-title">Invoice #{invoiceNumber}</h2>
           </div>
           <div class="invoice-dates">
             <div class="date-row">
@@ -137,15 +214,14 @@
             </span>
           </div>
           <div class="from-user">
-            <div class="from-avatar">HB</div>
-            <span class="from-name">Harsh Bajpai</span>
+            <div class="from-avatar">JD</div>
+            <span class="from-name">John Doe</span>
           </div>
           <div class="from-address">
-            <p>1/195-C, SARVODAYA NAGAR, SHUKLAGANJ, rans Ganga Hitech City, Unnao, Uttar Pradesh</p>
-            <p>209861 Kanpur</p>
-            <p>Uttar Pradesh, India</p>
-            <p>09FEZPB7934A1Z5</p>
-            <p>bajpaiharsh244@gmail.com</p>
+            <p>742 Evergreen Terrace, Apt 3B</p>
+            <p>10001 New York</p>
+            <p>New York, United States</p>
+            <p>johndoe@example.com</p>
           </div>
         </div>
 
@@ -155,10 +231,17 @@
         <div class="form-section">
           <h3 class="form-label">Your client Information</h3>
           <div class="select-field">
-            <span class="select-placeholder">Find or add new client</span>
+            <span>Alice Ventures</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="1.5">
               <path d="M4 6l4 4 4-4"/>
             </svg>
+          </div>
+          <div class="client-detail">
+            <div class="client-avatar">AV</div>
+            <div class="client-info-text">
+              <span class="client-name">Alice Ventures</span>
+              <span class="client-email">alice@aliceventures.com</span>
+            </div>
           </div>
           <a href="#" class="add-link">+ Add email recipients</a>
         </div>
@@ -251,7 +334,7 @@
           <h3 class="form-label italic">Where do you want to receive your payment?</h3>
           <div class="wallet-input-field">
             <label class="wallet-label-float">Enter wallet address</label>
-            <input type="text" class="wallet-input" placeholder="0x..." />
+            <input type="text" class="wallet-input" placeholder="0x..." bind:value={walletAddress} />
           </div>
         </div>
 
@@ -331,7 +414,7 @@
         <div class="form-section memo-section">
           <div class="memo-attachments-row">
             <div class="memo-area">
-              <textarea placeholder="Memo" rows="4"></textarea>
+              <textarea placeholder="Memo" rows="4" bind:value={memo}></textarea>
             </div>
             <div class="attachments-area">
               <h4>Attached files</h4>
@@ -346,87 +429,136 @@
     <!-- Right: Progress Sidebar -->
     <div class="progress-sidebar">
       <div class="progress-card">
-        <h2 class="progress-title">Invoice #14</h2>
+        <h2 class="progress-title">Invoice #{invoiceNumber}</h2>
 
         <div class="progress-steps">
-          <div class="step completed">
-            <div class="step-indicator green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                <path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/>
-              </svg>
-            </div>
+          <!-- Your credentials -->
+          <div class="step" class:completed={credentialsComplete}>
+            {#if credentialsComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Your credentials</span>
-              <span class="step-detail">bajpaiharsh244@gmail.com</span>
+              {#if credentialsComplete}<span class="step-detail">johndoe@example.com</span>{/if}
             </div>
           </div>
 
-          <div class="step pending">
-            <div class="step-indicator gray"></div>
+          <!-- Billed to -->
+          <div class="step" class:completed={billedToComplete}>
+            {#if billedToComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Billed to</span>
+              {#if billedToComplete}<span class="step-detail">Alice Ventures</span>{/if}
             </div>
           </div>
 
-          <div class="step completed">
-            <div class="step-indicator green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                <path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/>
-              </svg>
-            </div>
+          <!-- Invoice Currency -->
+          <div class="step" class:completed={currencyComplete}>
+            {#if currencyComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Invoice Currency</span>
-              <span class="step-detail">USD</span>
+              {#if currencyComplete}<span class="step-detail">USD</span>{/if}
             </div>
           </div>
 
-          <div class="step completed">
-            <div class="step-indicator green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                <path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/>
-              </svg>
-            </div>
+          <!-- Invoice Type -->
+          <div class="step" class:completed={invoiceTypeComplete}>
+            {#if invoiceTypeComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Invoice Type</span>
-              <span class="step-detail">Regular Invoice</span>
+              {#if invoiceTypeComplete}<span class="step-detail">{invoiceType === 'regular' ? 'Regular Invoice' : 'Recurring Invoice'}</span>{/if}
             </div>
           </div>
 
-          <div class="step completed">
-            <div class="step-indicator green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                <path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/>
-              </svg>
-            </div>
+          <!-- Receive Payment -->
+          <div class="step" class:completed={receivePaymentComplete}>
+            {#if receivePaymentComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Receive Payment</span>
-              <span class="step-detail">Wallet (0x226A3...8aB8Dc7) in DAI (on Ethereum)</span>
+              {#if receivePaymentComplete}
+                <span class="step-detail">Wallet ({truncateWallet(walletAddress)}) in {selectedCurrency.toUpperCase()} (on {selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1)})</span>
+              {/if}
             </div>
           </div>
 
-          <div class="step pending">
-            <div class="step-indicator gray"></div>
+          <!-- Amount Details -->
+          <div class="step" class:completed={amountComplete}>
+            {#if amountComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Amount Details</span>
+              {#if amountComplete}<span class="step-detail">{fmt(totalAmount)}</span>{/if}
             </div>
           </div>
 
-          <div class="step pending">
-            <div class="step-indicator gray"></div>
+          <!-- Memo & Attachments -->
+          <div class="step" class:completed={memoComplete}>
+            {#if memoComplete}
+              <div class="step-indicator green">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M6.5 10.5L4 8l-.7.7 3.2 3.2 6.9-6.9-.7-.7L6.5 10.5z"/></svg>
+              </div>
+            {:else}
+              <div class="step-indicator gray"></div>
+            {/if}
             <div class="step-content">
               <span class="step-label">Memo & Attachments (Optional)</span>
+              {#if memoComplete}<span class="step-detail">Memo added</span>{/if}
             </div>
           </div>
         </div>
 
         <div class="progress-actions">
           <button class="btn-save-draft">Save draft</button>
-          <button class="btn-create-send">Create & Send</button>
+          <button class="btn-create-send" onclick={createAndSend} disabled={isSending || !receivePaymentComplete || !amountComplete}>
+            {isSending ? 'Sending...' : 'Create & Send'}
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+{#if showSuccess}
+  <InvoiceSuccess
+    clientEmail="alice@aliceventures.com"
+    onClose={onClose}
+    onBackToDashboard={() => { onBackToDashboard(); onClose(); }}
+    onCreateNew={() => { showSuccess = false; invoiceNumber++; lineItems = [{ id: nextId++, description: '', qty: 1, unitPrice: 0, discount: 0, taxPercent: 0 }]; memo = ''; walletAddress = ''; }}
+  />
+{/if}
 
 <style>
   .overlay {
@@ -768,6 +900,44 @@
 
   .wallet-input::placeholder {
     color: #9ca3af;
+  }
+
+  .client-detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px 0;
+  }
+
+  .client-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #8B5CF6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .client-info-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .client-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+  }
+
+  .client-email {
+    font-size: 12px;
+    color: #6b7280;
   }
 
   .add-link {
@@ -1237,7 +1407,12 @@
     cursor: pointer;
   }
 
-  .btn-create-send:hover {
+  .btn-create-send:hover:not(:disabled) {
     background: #2D4AE6;
+  }
+
+  .btn-create-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>

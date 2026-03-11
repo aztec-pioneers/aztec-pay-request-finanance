@@ -2,13 +2,20 @@
   import Sidebar from '$lib/components/Sidebar.svelte';
   import TopBar from '$lib/components/TopBar.svelte';
   import Dashboard from '$lib/components/Dashboard.svelte';
+  import SentInvoices from '$lib/components/SentInvoices.svelte';
+
+  let currentView = $state('dashboard');
 </script>
 
 <div class="app-layout">
-  <Sidebar />
+  <Sidebar {currentView} onNavigate={(view) => currentView = view} />
   <div class="main-content">
     <TopBar />
-    <Dashboard />
+    {#if currentView === 'dashboard'}
+      <Dashboard />
+    {:else if currentView === 'invoicing'}
+      <SentInvoices />
+    {/if}
   </div>
 </div>
 

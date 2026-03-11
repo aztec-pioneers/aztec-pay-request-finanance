@@ -1,4 +1,6 @@
 <script lang="ts">
+  let { currentView = 'dashboard', onNavigate = (view: string) => {} } = $props();
+  let invoicingOpen = $state(false);
 </script>
 
 <aside class="sidebar">
@@ -26,22 +28,26 @@
   </button>
 
   <nav class="nav-menu">
-    <a href="/" class="nav-item active">
+    <button class="nav-item" class:active={currentView === 'dashboard'} onclick={() => onNavigate('dashboard')}>
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 2L2 8v10h6v-6h4v6h6V8l-8-6z"/>
       </svg>
       Dashboard
-    </a>
-    <a href="/invoicing" class="nav-item has-submenu">
+    </button>
+    <button class="nav-item has-submenu" class:active={currentView === 'invoicing'} onclick={() => { invoicingOpen = !invoicingOpen; onNavigate('invoicing'); }}>
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M4 2h8l4 4v12H4V2zm8 0v4h4"/>
         <path d="M7 9h6M7 12h4" stroke="white" stroke-width="1"/>
       </svg>
       Invoicing
-      <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+      <svg class="chevron" class:open={invoicingOpen} width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M6 4l4 4-4 4"/>
       </svg>
-    </a>
+    </button>
+    {#if invoicingOpen || currentView === 'invoicing'}
+      <button class="nav-subitem active" onclick={() => onNavigate('invoicing')}>Sent Invoices</button>
+      <button class="nav-subitem">Clients</button>
+    {/if}
     <a href="/payments" class="nav-item has-submenu">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M17 7H3a1 1 0 00-1 1v8a1 1 0 001 1h14a1 1 0 001-1V8a1 1 0 00-1-1zM2 10h16M6 14h4"/>
@@ -175,6 +181,12 @@
     font-size: 14px;
     font-weight: 500;
     transition: background 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
   }
 
   .nav-item:hover {
@@ -195,6 +207,33 @@
     color: #9ca3af;
     width: 14px;
     height: 14px;
+    transition: transform 0.15s;
+  }
+
+  .chevron.open {
+    transform: rotate(90deg);
+  }
+
+  .nav-subitem {
+    padding: 7px 12px 7px 42px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: inherit;
+  }
+
+  .nav-subitem:hover {
+    background: #f3f4f6;
+  }
+
+  .nav-subitem.active {
+    color: #3B82F6;
   }
 
   .badge {
