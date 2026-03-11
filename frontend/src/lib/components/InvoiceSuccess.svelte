@@ -1,5 +1,21 @@
 <script lang="ts">
-  let { clientEmail = '', onClose = () => {}, onBackToDashboard = () => {}, onCreateNew = () => {} } = $props();
+  let { clientEmail = '', invoiceId = 0, onClose = () => {}, onBackToDashboard = () => {}, onCreateNew = () => {} } = $props();
+
+  let copied = $state(false);
+
+  function getInvoiceLink(): string {
+    return `${window.location.origin}/invoice/${invoiceId}`;
+  }
+
+  async function copyLink() {
+    await navigator.clipboard.writeText(getInvoiceLink());
+    copied = true;
+    setTimeout(() => { copied = false; }, 2000);
+  }
+
+  function viewInvoice() {
+    window.open(getInvoiceLink(), '_blank');
+  }
 </script>
 
 <div class="success-overlay">
@@ -55,14 +71,14 @@
         <svg class="share-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#374151" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6"/></svg>
       </button>
 
-      <button class="share-card">
+      <button class="share-card" onclick={copyLink}>
         <div class="share-icon copy">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="white">
             <circle cx="11" cy="9" r="4"/>
             <path d="M4 19c0-3 3-5 7-5s7 2 7 5"/>
           </svg>
         </div>
-        <span class="share-label">Copy the Link</span>
+        <span class="share-label">{copied ? 'Copied!' : 'Copy the Link'}</span>
         <svg class="share-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#374151" stroke-width="1.5">
           <path d="M6.5 9.5a3 3 0 004.2 0l1.5-1.5a3 3 0 00-4.2-4.2L7 4.8"/>
           <path d="M9.5 6.5a3 3 0 00-4.2 0L3.8 8a3 3 0 004.2 4.2L9 11.2"/>
@@ -75,7 +91,7 @@
       <span class="link-divider"></span>
       <button class="bottom-link" onclick={onCreateNew}>Create new Invoice</button>
       <span class="link-divider"></span>
-      <button class="bottom-link">View Invoice</button>
+      <button class="bottom-link" onclick={viewInvoice}>View Invoice</button>
     </div>
   </div>
 </div>

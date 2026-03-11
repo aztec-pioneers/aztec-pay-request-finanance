@@ -12,6 +12,7 @@
   let isSending = $state(false);
   let invoiceNumber = $state(0);
   let showSuccess = $state(false);
+  let createdInvoiceId = $state(0);
 
   $effect(() => {
     fetch('http://localhost:3001/api/invoices/next-number')
@@ -113,6 +114,8 @@
       });
 
       if (res.ok) {
+        const data = await res.json();
+        createdInvoiceId = data.id;
         showSuccess = true;
       } else {
         const err = await res.json();
@@ -554,6 +557,7 @@
 {#if showSuccess}
   <InvoiceSuccess
     clientEmail="alice@aliceventures.com"
+    invoiceId={createdInvoiceId}
     onClose={onClose}
     onBackToDashboard={() => { onBackToDashboard(); onClose(); }}
     onCreateNew={() => { showSuccess = false; invoiceNumber++; lineItems = [{ id: nextId++, description: '', qty: 1, unitPrice: 0, discount: 0, taxPercent: 0 }]; memo = ''; walletAddress = ''; }}
