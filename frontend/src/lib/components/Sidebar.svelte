@@ -74,6 +74,14 @@
       Cards
       <span class="badge">Coming Soon</span>
     </a>
+    <a href="/aztec-wallet" class="nav-item" class:active={currentView === 'aztec-wallet'}>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <rect x="2" y="5" width="16" height="11" rx="2"/>
+        <path d="M13 10.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill="white"/>
+        <path d="M4 5V4a2 2 0 012-2h8a2 2 0 012 2v1" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Aztec Wallet
+    </a>
     <a href="/invoiceme" class="nav-item">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M14 2C14 2 16 4 16 6s-2 4-2 4M6 18c0 0-2-2-2-4s2-4 2-4"/>

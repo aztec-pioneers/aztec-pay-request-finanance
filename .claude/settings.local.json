@@ -9,7 +9,18 @@
       "Bash(cd /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-request-finance/backend && bun init -y 2>&1)",
       "Bash(lsof -ti:3001 | xargs kill -9 2>/dev/null; sleep 1 && cd /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-request-finance/backend && bun run index.ts 2>&1)",
       "Bash(sleep 2 && curl -s -X POST http://localhost:3001/api/invoices \\\\\n  -H \"Content-Type: application/json\" \\\\\n  -d '{\n    \"invoiceNumber\": \"Invoice #14\",\n    \"issuedDate\": \"2026-03-11\",\n    \"dueDate\": \"2026-04-10\",\n    \"fromName\": \"John Doe\",\n    \"fromAddress\": \"742 Evergreen Terrace\",\n    \"fromEmail\": \"johndoe@example.com\",\n    \"clientName\": \"Alice Ventures\",\n    \"clientEmail\": \"alice@aliceventures.com\",\n    \"invoiceCurrency\": \"USD\",\n    \"invoiceType\": \"regular\",\n    \"paymentMethod\": \"crypto\",\n    \"paymentNetwork\": \"aztec\",\n    \"paymentCurrency\": \"usdc\",\n    \"walletAddress\": \"0x1234567890abcdef\",\n    \"amountWithoutTax\": 500,\n    \"totalTax\": 0,\n    \"totalAmount\": 500,\n    \"memo\": \"Test invoice\",\n    \"items\": [{\"description\": \"Web dev\", \"qty\": 1, \"unitPrice\": 500, \"discount\": 0, \"taxPercent\": 0, \"amount\": 500}]\n  }')",
-      "Bash(lsof -ti:3001 | xargs kill -9 2>/dev/null; lsof -ti:5173 | xargs kill -9 2>/dev/null; echo \"Done\")"
+      "Bash(lsof -ti:3001 | xargs kill -9 2>/dev/null; lsof -ti:5173 | xargs kill -9 2>/dev/null; echo \"Done\")",
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "Bash(find /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-private-intent-bridge -maxdepth 2 -type f \\\\\\( -name \"webpack*\" -o -name \"*.config.*\" \\\\\\) 2>/dev/null | head -20)",
+      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; echo \"done\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/ 2>&1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; npm run dev 2>&1 | head -40)",
+      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; NODE_OPTIONS=\"--max-old-space-size=8192\" npm run dev 2>&1 | head -5)",
+      "Bash(npx webpack:*)",
+      "Bash(curl -s http://localhost:3001/api/invoices/8 | head -c 200)",
+      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; npx webpack serve --mode development 2>&1 | head -5)"
     ]
   }
 }

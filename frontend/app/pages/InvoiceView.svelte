@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import TopBar from '$lib/components/TopBar.svelte';
   import ConnectWallet from '$lib/components/ConnectWallet.svelte';
+  import AztecPayment from '$lib/components/AztecPayment.svelte';
+
+  let { invoiceId = '' } = $props();
 
   let showWalletModal = $state(false);
+  let showAztecPayment = $state(false);
 
   type InvoiceItem = {
     id: number;
@@ -47,8 +50,9 @@
   let error = $state('');
 
   $effect(() => {
-    const id = $page.params.id;
-    fetch(`http://localhost:3001/api/invoices/${id}`)
+    if (!invoiceId) return;
+    loading = true;
+    fetch(`http://localhost:3001/api/invoices/${invoiceId}`)
       .then(r => {
         if (!r.ok) throw new Error('Invoice not found');
         return r.json();
@@ -271,7 +275,23 @@
 {#if showWalletModal}
   <ConnectWallet
     onClose={() => showWalletModal = false}
-    onSelect={(wallet) => { showWalletModal = false; }}
+    onSelect={(wallet) => {
+      showWalletModal = false;
+      if (wallet === 'Pay Privately via Aztec') {
+        showAztecPayment = true;
+      }
+    }}
+  />
+{/if}
+
+{#if showAztecPayment && invoice}
+  <AztecPayment
+    invoiceId={invoice.id}
+    walletAddress={invoice.wallet_address}
+    amount={invoice.total_amount}
+    paymentCurrency={invoice.payment_currency || 'usdc'}
+    onClose={() => { showAztecPayment = false; window.location.reload(); }}
+    onPaid={() => { if (invoice) invoice.status = 'approved'; }}
   />
 {/if}
 
@@ -303,7 +323,6 @@
     font-size: 16px;
   }
 
-  /* Header */
   .view-header {
     display: flex;
     justify-content: space-between;
@@ -377,7 +396,6 @@
     justify-content: center;
   }
 
-  /* Body */
   .view-body {
     display: grid;
     grid-template-columns: 1fr 280px;
@@ -385,11 +403,8 @@
     align-items: start;
   }
 
-  .header-spacer {
-    /* empty cell in the timeline column for the header row */
-  }
+  .header-spacer {}
 
-  /* Invoice Card */
   .invoice-card {
     flex: 1;
     background: white;
@@ -508,7 +523,6 @@
     word-break: break-all;
   }
 
-  /* Status Badge */
   .status-badge {
     display: inline-block;
     padding: 4px 14px;
@@ -518,27 +532,11 @@
     margin-top: 6px;
   }
 
-  .status-pending {
-    background: #FEF3C7;
-    color: #92400E;
-  }
+  .status-pending { background: #FEF3C7; color: #92400E; }
+  .status-approved { background: #D1FAE5; color: #065F46; }
+  .status-rejected { background: #FEE2E2; color: #991B1B; }
+  .status-paid { background: #D1FAE5; color: #065F46; }
 
-  .status-approved {
-    background: #D1FAE5;
-    color: #065F46;
-  }
-
-  .status-rejected {
-    background: #FEE2E2;
-    color: #991B1B;
-  }
-
-  .status-paid {
-    background: #D1FAE5;
-    color: #065F46;
-  }
-
-  /* Items Table */
   .items-table {
     width: 100%;
     border-collapse: collapse;
@@ -554,9 +552,7 @@
     border-bottom: 2px solid #3B5BF7;
   }
 
-  .items-table .col-amount {
-    text-align: right;
-  }
+  .items-table .col-amount { text-align: right; }
 
   .items-table tbody td {
     padding: 12px 8px;
@@ -570,7 +566,6 @@
     font-weight: 500;
   }
 
-  /* Totals */
   .totals {
     max-width: 320px;
     margin-left: auto;
@@ -584,9 +579,7 @@
     color: #374151;
   }
 
-  .total-row.bold {
-    font-weight: 700;
-  }
+  .total-row.bold { font-weight: 700; }
 
   .total-divider {
     border: none;
@@ -601,7 +594,6 @@
     line-height: 1.5;
   }
 
-  /* Timeline Sidebar */
   .timeline-sidebar {
     width: 280px;
     min-width: 280px;
