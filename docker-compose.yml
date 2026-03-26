@@ -1,0 +1,13 @@
+services:
+  aztec:
+    build:
+      context: .
+      dockerfile: Dockerfile.aztec
+    ports:
+      - "8080:8080"   # Aztec node
+      - "8880:8880"   # Aztec admin
+      - "8545:8545"   # Anvil L1
+    environment:
+      - AZTEC_PORT=8080
+      - AZTEC_ADMIN_PORT=8880
+    restart: unless-stopped

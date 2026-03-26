@@ -31,10 +31,13 @@
 
   const tabs = ['Overview', 'Draft', 'Approved', 'Awaiting Payment', 'Overdue', 'Paid'] as const;
 
+  declare const __BACKEND_URL__: string;
+  const BACKEND_URL = typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : '';
+
   async function fetchInvoices() {
     loading = true;
     try {
-      const res = await fetch('http://localhost:3001/api/invoices');
+      const res = await fetch(`${BACKEND_URL}/api/invoices`);
       if (res.ok) {
         invoices = await res.json();
       }

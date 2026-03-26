@@ -49,10 +49,13 @@
   let loading = $state(true);
   let error = $state('');
 
+  declare const __BACKEND_URL__: string;
+  const BACKEND_URL = typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : '';
+
   $effect(() => {
     if (!invoiceId) return;
     loading = true;
-    fetch(`http://localhost:3001/api/invoices/${invoiceId}`)
+    fetch(`${BACKEND_URL}/api/invoices/${invoiceId}`)
       .then(r => {
         if (!r.ok) throw new Error('Invoice not found');
         return r.json();
@@ -277,7 +280,7 @@
     onClose={() => showWalletModal = false}
     onSelect={(wallet) => {
       showWalletModal = false;
-      if (wallet === 'Pay Privately via Aztec') {
+      if (wallet === 'MetaMask') {
         showAztecPayment = true;
       }
     }}

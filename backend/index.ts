@@ -1,7 +1,8 @@
 import { handleRequest } from "./src/routes";
 
 const server = Bun.serve({
-  port: 3001,
+  port: process.env.PORT || 3001,
+  hostname: "0.0.0.0",
   fetch: handleRequest,
 });
 

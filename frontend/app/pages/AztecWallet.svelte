@@ -18,7 +18,7 @@
   let showSecret = $state(false);
   let bridgeHealth: any = $state(null);
 
-  const BRIDGE_URL = 'http://localhost:3002';
+  const BRIDGE_URL = 'https://bridge-backend-production-35fd.up.railway.app';
 
   async function init() {
     state = 'loading';
@@ -35,7 +35,7 @@
       tokenAddress = bridgeHealth.tokenAddress;
     } catch {
       state = 'no_bridge';
-      errorMessage = 'Cannot connect to Aztec bridge on port 3002.';
+      errorMessage = 'Cannot connect to Aztec bridge.';
       return;
     }
 

@@ -21,12 +21,13 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "@aztec/aztec.js": "^4.0.0-devnet.2-patch.1",
-    "@aztec/noir-contracts.js": "^4.0.0-devnet.2-patch.1",
-    "@aztec/wallets": "^4.0.0-devnet.2-patch.1",
+    "@aztec/aztec.js": "^4.0.0-devnet.2-patch.3",
+    "@aztec/noir-contracts.js": "^4.0.0-devnet.2-patch.3",
+    "@aztec/wallets": "^4.0.0-devnet.2-patch.3",
     "@defi-wonderland/aztec-standards": "^4.0.0-devnet.2-patch.1",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
+    "process": "^0.11.10",
     "util": "^0.12.5"
   }
 }

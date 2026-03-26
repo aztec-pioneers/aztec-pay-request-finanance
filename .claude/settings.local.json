@@ -20,7 +20,32 @@
       "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; NODE_OPTIONS=\"--max-old-space-size=8192\" npm run dev 2>&1 | head -5)",
       "Bash(npx webpack:*)",
       "Bash(curl -s http://localhost:3001/api/invoices/8 | head -c 200)",
-      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; npx webpack serve --mode development 2>&1 | head -5)"
+      "Bash(lsof -ti:5173 | xargs kill -9 2>/dev/null; npx webpack serve --mode development 2>&1 | head -5)",
+      "Bash(which aztec:*)",
+      "Bash(aztec start:*)",
+      "Bash(railway whoami:*)",
+      "Bash(railway login:*)",
+      "Bash(export RAILWAY_TOKEN=557416fc-fe50-49dc-9175-538b779929ed)",
+      "Bash(RAILWAY_TOKEN=557416fc-fe50-49dc-9175-538b779929ed railway status 2>&1)",
+      "Bash(railway list:*)",
+      "Bash(railway link:*)",
+      "Bash(railway up:*)",
+      "Bash(railway service:*)",
+      "Bash(railway status:*)",
+      "Bash(railway help:*)",
+      "Bash(railway add:*)",
+      "Bash(railway environment:*)",
+      "Bash(railway open:*)",
+      "Bash(railway logs:*)",
+      "Bash(railway domain:*)",
+      "Bash(railway variable:*)",
+      "Bash(curl:*)",
+      "Bash(grep -r 0x[a-fA-F0-9] /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-request-finance --include=*.ts --include=*.tsx --include=*.js --include=*.svelte)",
+      "Bash(grep -r \"localhost\\\\|8080\\\\|3001\\\\|3002\\\\|http\\\\|url\\\\|endpoint\\\\|address\" /Users/harshbajpai/Desktop/Projects/aztec-projects/aztec-request-finance --include=\"*.ts\" --include=\"*.tsx\" --include=\"*.svelte\" --include=\"*.js\" ! -path \"*/node_modules/*\" ! -path \"*/.git/*\")",
+      "Bash(grep:*)",
+      "Bash(npm view:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(railway down:*)"
     ]
   }
 }

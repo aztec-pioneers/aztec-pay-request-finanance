@@ -3,7 +3,7 @@
  * Creates/restores an Aztec wallet, queries USDC balances.
  */
 
-const BRIDGE_URL = 'http://localhost:3002';
+const BRIDGE_URL = 'https://bridge-backend-production-35fd.up.railway.app';
 const STORAGE_KEY = 'aztec-wallet';
 
 type WalletData = {

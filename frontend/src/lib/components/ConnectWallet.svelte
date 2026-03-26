@@ -4,7 +4,6 @@
   const wallets = [
     { name: 'MetaMask', icon: '🦊', color: '#E2761B' },
     { name: 'Phantom', icon: '👻', color: '#AB9FF2' },
-    { name: 'Pay Privately via Aztec', icon: 'A', color: '#473F6E' },
     { name: 'Safe', icon: '🔒', color: '#374151' },
     { name: 'WalletConnect', icon: '🔗', color: '#3B99FC' },
     { name: 'Pay via Exchange', icon: '⚡', color: '#374151' },
@@ -69,8 +68,6 @@
                 <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#FFF4E0"/><text x="16" y="22" text-anchor="middle" font-size="18">🦊</text></svg>
               {:else if wallet.name === 'Phantom'}
                 <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#F3F0FF"/><text x="16" y="22" text-anchor="middle" font-size="16">👻</text></svg>
-              {:else if wallet.name === 'Pay Privately via Aztec'}
-                <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#EEEDF5"/><text x="16" y="21" text-anchor="middle" font-size="16" font-weight="700" fill="#473F6E">A</text></svg>
               {:else if wallet.name === 'Safe'}
                 <svg width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#F3F4F6"/><rect x="8" y="8" width="16" height="16" rx="3" stroke="#374151" stroke-width="1.5" fill="none"/><path d="M12 14h8M12 18h8" stroke="#374151" stroke-width="1.5"/></svg>
               {:else if wallet.name === 'WalletConnect'}

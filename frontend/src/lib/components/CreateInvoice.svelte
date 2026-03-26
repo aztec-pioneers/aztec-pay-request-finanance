@@ -14,8 +14,11 @@
   let showSuccess = $state(false);
   let createdInvoiceId = $state(0);
 
+  declare const __BACKEND_URL__: string;
+  const BACKEND_URL = typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : '';
+
   $effect(() => {
-    fetch('http://localhost:3001/api/invoices/next-number')
+    fetch(`${BACKEND_URL}/api/invoices/next-number`)
       .then(r => r.json())
       .then(data => { invoiceNumber = data.nextNumber; })
       .catch(() => { invoiceNumber = 1; });
@@ -80,7 +83,7 @@
   async function createAndSend() {
     isSending = true;
     try {
-      const res = await fetch('http://localhost:3001/api/invoices', {
+      const res = await fetch(`${BACKEND_URL}/api/invoices`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,7 +125,7 @@
         alert(`Error: ${err.error || 'Failed to create invoice'}`);
       }
     } catch {
-      alert('Failed to connect to backend. Is it running on port 3001?');
+      alert('Failed to connect to backend.');
     } finally {
       isSending = false;
     }

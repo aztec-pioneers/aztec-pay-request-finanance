@@ -8,8 +8,10 @@
     onPaid?: () => void;
   }>();
 
-  const BRIDGE_URL = 'http://localhost:3002';
-  const BACKEND_URL = 'http://localhost:3001';
+  const BRIDGE_URL = 'https://bridge-backend-production-35fd.up.railway.app';
+
+  declare const __BACKEND_URL__: string;
+  const BACKEND_URL = typeof __BACKEND_URL__ !== 'undefined' ? __BACKEND_URL__ : '';
 
   type SessionStatus = 'initiating' | 'awaiting_deposit' | 'processing' | 'completed' | 'expired' | 'error';
 
@@ -260,7 +262,7 @@
           </div>
           <h2 class="status-title">Connection Error</h2>
           <p class="status-desc">{errorMessage}</p>
-          <p class="status-sub">Make sure the Aztec bridge is running on port 3002.</p>
+          <p class="status-sub">Make sure the Aztec bridge is running.</p>
         </div>
         <button class="retry-btn" onclick={initiateBridge}>Try Again</button>
       {/if}

@@ -48,7 +48,11 @@ export default (_, argv) => ({
       chunks: ['main'],
       scriptLoading: 'module',
     }),
-    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
+    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], process: 'process/browser' }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify({}),
+      '__BACKEND_URL__': JSON.stringify(argv.mode === 'production' ? 'https://request-backend-production.up.railway.app' : ''),
+    }),
   ],
   resolve: {
     conditionNames: ['svelte', 'browser', 'import'],
@@ -56,6 +60,7 @@ export default (_, argv) => ({
     alias: {
       '$lib': path.resolve(__dirname, 'src/lib'),
       'pino': path.resolve(__dirname, 'src/lib/pino-browser-stub.ts'),
+      'colorette': path.resolve(__dirname, 'src/lib/colorette-stub.ts'),
     },
     fallback: {
       tty: false,
@@ -71,7 +76,7 @@ export default (_, argv) => ({
     port: 5173,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
     },
     client: {
       overlay: false,
